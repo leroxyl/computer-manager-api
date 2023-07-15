@@ -42,6 +42,7 @@ The application provides a REST API to manage computer-related datasets that are
   - operation will fail if any required field (other than MAC address) is not provided in request body
   - operation will overwrite optional fields with empty value if field is not provided in request body
 - Delete: HTTP DELETE `/computers/{mac}`
+  - repeatedly calling delete on same resource will return `200`
 
 
 ### Example Requests
@@ -63,6 +64,11 @@ The application provides a REST API to manage computer-related datasets that are
     -X PUT \
     -H "Content-Type: application/json" \
     -d '{"computerName": "localhorst", "ipAddr": "127.0.0.2", "employeeAbbr": "mmu"}' \
+    -i
+
+#### Delete
+    curl localhost:8080/computers/00:1B:44:11:3A:B7 \
+    -X DELETE \
     -i
 
 

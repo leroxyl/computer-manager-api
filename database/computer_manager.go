@@ -55,3 +55,8 @@ func (cm *ComputerManager) Update(computer *Computer) error {
 	result := cm.db.Save(computer)
 	return result.Error
 }
+
+func (cm *ComputerManager) Delete(computer *Computer) error {
+	result := cm.db.Delete(computer)
+	return result.Error
+}
