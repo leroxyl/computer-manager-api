@@ -1,7 +1,7 @@
 package database
 
 type Computer struct {
-	MACAddr      string `json:"macAddr" gorm:"not null;primaryKey"`
+	MACAddr      string `json:"macAddr" gorm:"primaryKey"`
 	ComputerName string `json:"computerName" gorm:"not null"`
 	IPAddr       string `json:"ipAddr" gorm:"not null"`
 	EmployeeAbbr string `json:"employeeAbbr"`
