@@ -43,6 +43,7 @@ The application provides a REST API to manage computer-related datasets that are
   - operation will overwrite optional fields with empty value if field is not provided in request body
 - Delete: HTTP DELETE `/computers/{mac}`
   - repeatedly calling delete on same resource will return `200`
+- Read All: HTTP GET `/computers`
 
 
 ### Example Requests
@@ -69,6 +70,12 @@ The application provides a REST API to manage computer-related datasets that are
 #### Delete
     curl localhost:8080/computers/00:1B:44:11:3A:B7 \
     -X DELETE \
+    -i
+
+#### Read All
+
+    curl localhost:8080/computers \
+    -X GET \
     -i
 
 

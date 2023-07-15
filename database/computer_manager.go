@@ -60,3 +60,8 @@ func (cm *ComputerManager) Delete(computer *Computer) error {
 	result := cm.db.Delete(computer)
 	return result.Error
 }
+
+func (cm *ComputerManager) ReadAll(computers *[]Computer) error {
+	result := cm.db.Find(computers)
+	return result.Error
+}
