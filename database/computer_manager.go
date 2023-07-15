@@ -45,3 +45,8 @@ func (cm *ComputerManager) Create(computer *Computer) error {
 	result := cm.db.Create(computer)
 	return result.Error
 }
+
+func (cm *ComputerManager) Read(computer *Computer) error {
+	result := cm.db.First(computer)
+	return result.Error
+}

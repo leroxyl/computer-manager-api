@@ -11,6 +11,7 @@ import (
 
 type ComputerManager interface {
 	Create(*database.Computer) error
+	Read(*database.Computer) error
 }
 
 // Run initializes all endpoints and starts the server.
@@ -19,6 +20,7 @@ func Run(cm ComputerManager) {
 	r := gin.Default()
 
 	r.POST("/computers", createComputer(cm))
+	r.GET("/computers/:mac", readComputer(cm))
 
 	// listen and serve
 	err := r.Run()
@@ -37,6 +39,22 @@ func createComputer(cm ComputerManager) gin.HandlerFunc {
 		}
 
 		err = cm.Create(computer)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, computer)
+	}
+}
+
+func readComputer(cm ComputerManager) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		computer := &database.Computer{
+			MACAddr: c.Param("mac"),
+		}
+
+		err := cm.Read(computer)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

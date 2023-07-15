@@ -50,6 +50,11 @@ The application provides a REST API to manage computer-related datasets that are
     -d '{"macAddr": "00:1B:44:11:3A:B7", "computerName": "localhorst", "ipAddr": "127.0.0.1", "employeeAbbr": "rpm", "description": "hello :)"}' \
     -i
 
+#### Read
+    curl localhost:8080/computers/00:1B:44:11:3A:B7 \
+    -X GET \
+    -i
+
 
 ### Limitations
 
