@@ -50,3 +50,8 @@ func (cm *ComputerManager) Read(computer *Computer) error {
 	result := cm.db.First(computer)
 	return result.Error
 }
+
+func (cm *ComputerManager) Update(computer *Computer) error {
+	result := cm.db.Save(computer)
+	return result.Error
+}
