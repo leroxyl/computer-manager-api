@@ -1,15 +1,18 @@
 package database
 
 import (
-	"log"
 	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
 	dsnEnv = "GREENBONE_POSTGRES_DSN"
+
+	adminNotificationThreshold = 2 // TODO externalize admin notification threshold
 )
 
 type ComputerManager struct {
@@ -43,7 +46,13 @@ func NewComputerManager() *ComputerManager {
 
 func (cm *ComputerManager) Create(computer *Computer) error {
 	result := cm.db.Create(computer)
-	return result.Error
+	if result.Error != nil {
+		return result.Error
+	}
+
+	go cm.checkComputerCount(computer.EmployeeAbbr)
+
+	return nil
 }
 
 func (cm *ComputerManager) Read(computer *Computer) error {
@@ -53,7 +62,13 @@ func (cm *ComputerManager) Read(computer *Computer) error {
 
 func (cm *ComputerManager) Update(computer *Computer) error {
 	result := cm.db.Save(computer)
-	return result.Error
+	if result.Error != nil {
+		return result.Error
+	}
+
+	go cm.checkComputerCount(computer.EmployeeAbbr)
+
+	return nil
 }
 
 func (cm *ComputerManager) Delete(computer *Computer) error {
@@ -64,4 +79,23 @@ func (cm *ComputerManager) Delete(computer *Computer) error {
 func (cm *ComputerManager) ReadAll(computers *[]Computer) error {
 	result := cm.db.Find(computers)
 	return result.Error
+}
+
+func (cm *ComputerManager) checkComputerCount(employeeAbbr string) {
+	computerCount, err := cm.getComputerCountForEmployee(employeeAbbr)
+	if err != nil {
+		log.Errorf("failed to get computer count for employee %s from databse: %v", employeeAbbr, err)
+		return
+	}
+
+	log.Infof("employee %s now has %d computers", employeeAbbr, computerCount)
+
+	if computerCount > adminNotificationThreshold {
+		notifyAdmin(employeeAbbr, computerCount)
+	}
+}
+
+func (cm *ComputerManager) getComputerCountForEmployee(employeeAbbr string) (count int64, err error) {
+	err = cm.db.Model(&Computer{}).Where("employee_abbr = ?", employeeAbbr).Count(&count).Error
+	return count, err
 }

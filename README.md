@@ -31,7 +31,11 @@ The application provides a REST API to manage computer-related datasets that are
 
 - you need a running postgres database instance and set the DSN via env variable `GREENBONE_POSTGRES_DSN`
   - the database table will be automatically created at application start-up
-
+- start the notification service by running the following command
+    ```shell
+    docker pull greenbone/exercise-admin-notification && \
+    docker run -p 8081:8080 greenbone/exercise-admin-notification
+    ```
 
 ### Endpoints
 
