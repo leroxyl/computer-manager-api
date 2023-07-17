@@ -14,6 +14,7 @@ type ComputerManager interface {
 	Update(*entity.Computer) error
 	Delete(*entity.Computer) error
 	ReadAll(*[]entity.Computer) error
+	ReadAllForEmployee(*[]entity.Computer, string) error
 }
 
 // Run initializes all endpoints and starts the server.
@@ -26,6 +27,7 @@ func Run(cm ComputerManager) {
 	r.PUT("/computers/:mac", updateComputer(cm))
 	r.DELETE("/computers/:mac", deleteComputer(cm))
 	r.GET("/computers", readAllComputers(cm))
+	r.GET("/employees/:id/computers", readAllComputersForEmployee(cm))
 
 	// listen and serve
 	err := r.Run()
@@ -118,6 +120,20 @@ func readAllComputers(cm ComputerManager) gin.HandlerFunc {
 		var computers []entity.Computer
 
 		err := cm.ReadAll(&computers)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.IndentedJSON(http.StatusOK, computers)
+	}
+}
+
+func readAllComputersForEmployee(cm ComputerManager) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var computers []entity.Computer
+
+		err := cm.ReadAllForEmployee(&computers, c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

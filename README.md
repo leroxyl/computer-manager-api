@@ -48,6 +48,7 @@ The application provides a REST API to manage computer-related datasets that are
 - Delete: HTTP DELETE `/computers/{mac}`
   - repeatedly calling delete on same resource will return `200`
 - Read All: HTTP GET `/computers`
+- Read all assigned computers for an employee: HTTP GET `/employees/{employee abbreviation}/computers`
 
 
 ### Example Requests
@@ -72,6 +73,7 @@ The application provides a REST API to manage computer-related datasets that are
     -i
 
 #### Delete
+
     curl localhost:8080/computers/00:1B:44:11:3A:B7 \
     -X DELETE \
     -i
@@ -82,6 +84,11 @@ The application provides a REST API to manage computer-related datasets that are
     -X GET \
     -i
 
+#### Read All For Employee
+
+    curl localhost:8080/employees/rpm/computers \
+    -X GET \
+    -i
 
 ### Limitations
 

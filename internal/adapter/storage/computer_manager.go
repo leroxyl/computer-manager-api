@@ -83,6 +83,11 @@ func (cm *ComputerManager) ReadAll(computers *[]entity.Computer) error {
 	return result.Error
 }
 
+func (cm *ComputerManager) ReadAllForEmployee(computers *[]entity.Computer, employeeAbbr string) error {
+	result := cm.db.Where("employee_abbr = ?", employeeAbbr).Find(computers)
+	return result.Error
+}
+
 func (cm *ComputerManager) checkComputerCount(employeeAbbr string) {
 	computerCount, err := cm.getComputerCountForEmployee(employeeAbbr)
 	if err != nil {
