@@ -58,7 +58,7 @@ func createComputer(cm ComputerManager) gin.HandlerFunc {
 func readComputer(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		computer := &entity.Computer{
-			MACAddr: c.Param("mac"),
+			MACAddr: getMACAddress(c),
 		}
 
 		err := cm.Read(computer)
@@ -73,6 +73,8 @@ func readComputer(cm ComputerManager) gin.HandlerFunc {
 
 func updateComputer(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		mac := getMACAddress(c)
+
 		computer := &entity.Computer{}
 		err := c.BindJSON(computer)
 		if err != nil {
@@ -81,13 +83,13 @@ func updateComputer(cm ComputerManager) gin.HandlerFunc {
 		}
 
 		// prevent user from updating MAC address
-		if computer.MACAddr != "" && computer.MACAddr != c.Param("mac") {
+		if computer.MACAddr != "" && computer.MACAddr != mac {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "updating MAC address is not supported"})
 			return
 		}
 
 		// insert MAC address from URL parameter into Computer instance
-		computer.MACAddr = c.Param("mac")
+		computer.MACAddr = mac
 
 		err = cm.Update(computer)
 		if err != nil {
@@ -102,7 +104,7 @@ func updateComputer(cm ComputerManager) gin.HandlerFunc {
 func deleteComputer(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		computer := &entity.Computer{
-			MACAddr: c.Param("mac"),
+			MACAddr: getMACAddress(c),
 		}
 
 		err := cm.Delete(computer)
@@ -141,4 +143,11 @@ func readAllComputersForEmployee(cm ComputerManager) gin.HandlerFunc {
 
 		c.IndentedJSON(http.StatusOK, computers)
 	}
+}
+
+// getMACAddress returns the MAC address from the URL parameter
+func getMACAddress(c *gin.Context) string {
+	// TODO: here we could check if the value of the URL parameter is a valid MAC address
+	//  and return an error if it is invalid
+	return c.Param("mac")
 }
