@@ -14,7 +14,7 @@ import (
 const (
 	dsnEnv = "GREENBONE_POSTGRES_DSN"
 
-	adminNotificationThreshold = 2 // TODO externalize admin notification threshold
+	adminNotificationThreshold = 3 // TODO make admin notification threshold configurable
 )
 
 type ComputerManager struct {
@@ -97,7 +97,7 @@ func (cm *ComputerManager) checkComputerCount(employeeAbbr string) {
 
 	log.Infof("employee %s now has %d computers", employeeAbbr, computerCount)
 
-	if computerCount > adminNotificationThreshold {
+	if computerCount >= adminNotificationThreshold {
 		client.NotifyAdmin(employeeAbbr, computerCount)
 	}
 }

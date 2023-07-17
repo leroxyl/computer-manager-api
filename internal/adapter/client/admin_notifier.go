@@ -43,11 +43,15 @@ func NotifyAdmin(employeeAbbr string, computerCount int64) {
 	}
 	defer resp.Body.Close()
 
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Errorf("failed to read response body from admin notification service: %v", err)
+	}
+
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
 		log.Errorf("request to admin notification service failed (%d): %q", resp.StatusCode, body)
 		return
 	}
 
-	log.Infof("notified admin: %s", buffer.String())
+	log.Infof("notified admin: %s", body)
 }
