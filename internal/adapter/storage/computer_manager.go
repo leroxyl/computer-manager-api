@@ -36,6 +36,7 @@ func NewComputerManager() *ComputerManager {
 	}
 
 	// create or update computer table if necessary
+	// TODO: make migration conditional
 	err = db.AutoMigrate(&entity.Computer{})
 	if err != nil {
 		log.Fatalf("failed to auto-migrate database schema: %v", err)
