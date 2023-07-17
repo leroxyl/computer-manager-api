@@ -1,4 +1,4 @@
-package database
+package client
 
 import (
 	"bytes"
@@ -18,9 +18,9 @@ type Alarm struct {
 	Message              string `json:"message"`
 }
 
-// notifyAdmin sends an HTTP request to an external notification service in order to inform
+// NotifyAdmin sends an HTTP request to an external notification service in order to inform
 // an admin about employees with excessive computer demands
-func notifyAdmin(employeeAbbr string, computerCount int64) {
+func NotifyAdmin(employeeAbbr string, computerCount int64) {
 	alarm := Alarm{
 		Level:                "warning",
 		EmployeeAbbreviation: employeeAbbr,

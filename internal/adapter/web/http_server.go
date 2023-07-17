@@ -5,16 +5,15 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
-	"github.com/leroxyl/greenbone/database"
+	"github.com/leroxyl/greenbone/internal/entity"
 )
 
 type ComputerManager interface {
-	Create(*database.Computer) error
-	Read(*database.Computer) error
-	Update(*database.Computer) error
-	Delete(*database.Computer) error
-	ReadAll(*[]database.Computer) error
+	Create(*entity.Computer) error
+	Read(*entity.Computer) error
+	Update(*entity.Computer) error
+	Delete(*entity.Computer) error
+	ReadAll(*[]entity.Computer) error
 }
 
 // Run initializes all endpoints and starts the server.
@@ -37,7 +36,7 @@ func Run(cm ComputerManager) {
 
 func createComputer(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		computer := &database.Computer{}
+		computer := &entity.Computer{}
 		err := c.BindJSON(computer)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -56,7 +55,7 @@ func createComputer(cm ComputerManager) gin.HandlerFunc {
 
 func readComputer(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		computer := &database.Computer{
+		computer := &entity.Computer{
 			MACAddr: c.Param("mac"),
 		}
 
@@ -72,7 +71,7 @@ func readComputer(cm ComputerManager) gin.HandlerFunc {
 
 func updateComputer(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		computer := &database.Computer{}
+		computer := &entity.Computer{}
 		err := c.BindJSON(computer)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -100,7 +99,7 @@ func updateComputer(cm ComputerManager) gin.HandlerFunc {
 
 func deleteComputer(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		computer := &database.Computer{
+		computer := &entity.Computer{
 			MACAddr: c.Param("mac"),
 		}
 
@@ -116,7 +115,7 @@ func deleteComputer(cm ComputerManager) gin.HandlerFunc {
 
 func readAllComputers(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var computers []database.Computer
+		var computers []entity.Computer
 
 		err := cm.ReadAll(&computers)
 		if err != nil {

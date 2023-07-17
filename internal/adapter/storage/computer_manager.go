@@ -1,8 +1,10 @@
-package database
+package storage
 
 import (
 	"os"
 
+	"github.com/leroxyl/greenbone/internal/adapter/client"
+	"github.com/leroxyl/greenbone/internal/entity"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -34,7 +36,7 @@ func NewComputerManager() *ComputerManager {
 	}
 
 	// create or update computer table if necessary
-	err = db.AutoMigrate(&Computer{})
+	err = db.AutoMigrate(&entity.Computer{})
 	if err != nil {
 		log.Fatalf("failed to auto-migrate database schema: %v", err)
 	}
@@ -44,7 +46,7 @@ func NewComputerManager() *ComputerManager {
 	}
 }
 
-func (cm *ComputerManager) Create(computer *Computer) error {
+func (cm *ComputerManager) Create(computer *entity.Computer) error {
 	result := cm.db.Create(computer)
 	if result.Error != nil {
 		return result.Error
@@ -55,12 +57,12 @@ func (cm *ComputerManager) Create(computer *Computer) error {
 	return nil
 }
 
-func (cm *ComputerManager) Read(computer *Computer) error {
+func (cm *ComputerManager) Read(computer *entity.Computer) error {
 	result := cm.db.First(computer)
 	return result.Error
 }
 
-func (cm *ComputerManager) Update(computer *Computer) error {
+func (cm *ComputerManager) Update(computer *entity.Computer) error {
 	result := cm.db.Save(computer)
 	if result.Error != nil {
 		return result.Error
@@ -71,12 +73,12 @@ func (cm *ComputerManager) Update(computer *Computer) error {
 	return nil
 }
 
-func (cm *ComputerManager) Delete(computer *Computer) error {
+func (cm *ComputerManager) Delete(computer *entity.Computer) error {
 	result := cm.db.Delete(computer)
 	return result.Error
 }
 
-func (cm *ComputerManager) ReadAll(computers *[]Computer) error {
+func (cm *ComputerManager) ReadAll(computers *[]entity.Computer) error {
 	result := cm.db.Find(computers)
 	return result.Error
 }
@@ -91,11 +93,11 @@ func (cm *ComputerManager) checkComputerCount(employeeAbbr string) {
 	log.Infof("employee %s now has %d computers", employeeAbbr, computerCount)
 
 	if computerCount > adminNotificationThreshold {
-		notifyAdmin(employeeAbbr, computerCount)
+		client.NotifyAdmin(employeeAbbr, computerCount)
 	}
 }
 
 func (cm *ComputerManager) getComputerCountForEmployee(employeeAbbr string) (count int64, err error) {
-	err = cm.db.Model(&Computer{}).Where("employee_abbr = ?", employeeAbbr).Count(&count).Error
+	err = cm.db.Model(&entity.Computer{}).Where("employee_abbr = ?", employeeAbbr).Count(&count).Error
 	return count, err
 }

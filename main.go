@@ -1,14 +1,9 @@
 package main
 
 import (
-	"github.com/leroxyl/greenbone/database"
-	"github.com/leroxyl/greenbone/web"
+	"github.com/leroxyl/greenbone/cmd"
 )
 
 func main() {
-	// initialize database
-	cm := database.NewComputerManager()
-
-	// start server
-	web.Run(cm)
+	cmd.Run()
 }

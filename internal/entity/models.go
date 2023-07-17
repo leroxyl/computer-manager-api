@@ -1,4 +1,4 @@
-package database
+package entity
 
 type Computer struct {
 	MACAddr      string `json:"macAddr" gorm:"primaryKey;check:mac_addr_required,mac_addr <> ''"`
