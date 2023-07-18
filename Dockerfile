@@ -7,7 +7,8 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy the source code
-COPY ./ ./
+COPY main.go ./
+COPY internal ./internal
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/computer-manager-api
