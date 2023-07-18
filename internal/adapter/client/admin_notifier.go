@@ -14,18 +14,18 @@ import (
 var notificationServiceURL = os.Getenv("GREENBONE_NOTIFICATION_URL")
 
 type Alarm struct {
-	Level                string `json:"level"`
-	EmployeeAbbreviation string `json:"employeeAbbreviation"`
-	Message              string `json:"message"`
+	Level   string `json:"level"`
+	Abbr    string `json:"employeeAbbreviation"`
+	Message string `json:"message"`
 }
 
 // NotifyAdmin sends an HTTP request to an external notification service in order to inform
 // an admin about employees with excessive computer demands
 func NotifyAdmin(employeeAbbr string, computerCount int64) {
 	alarm := Alarm{
-		Level:                "warning",
-		EmployeeAbbreviation: employeeAbbr,
-		Message:              fmt.Sprintf("employee %s has %d computers", employeeAbbr, computerCount),
+		Level:   "warning",
+		Abbr:    employeeAbbr,
+		Message: fmt.Sprintf("employee %s has %d computers", employeeAbbr, computerCount),
 	}
 
 	buffer := &bytes.Buffer{}
