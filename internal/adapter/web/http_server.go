@@ -31,6 +31,9 @@ func NewServer(cm ComputerManager) *Server {
 		computerManager: cm,
 	}
 
+	// for this application we don't need any proxy headers
+	_ = r.SetTrustedProxies(nil)
+
 	r.POST("/computers", server.createComputer())
 	r.GET("/computers/:mac", server.readComputer())
 	r.PUT("/computers/:mac", server.updateComputer())
