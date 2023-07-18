@@ -112,7 +112,23 @@ psql postgres://postgres:postgres@localhost:5433/greenbone
 
 ### Limitations
 
-- MAC address is considered to be unique and used as primary key in database table
+- MAC address is considered to be unique and used as primary key in the database table
 - employee abbreviation is considered to be unique for each employee
-- client authentication is considered to be out of scope
 
+### Next Steps
+
+- add more tests
+- validate and normalize incoming data, i.e. parse types, check constraints, store in standardized representation etc.
+  - sanitizing input to prevent SQL injection is not needed since GORM takes care of this
+- return meaningful HTTP status codes and responses, especially for client-sided errors
+- add client authentication, maybe user management
+- enable TLS
+- make service more robust, for example with request timeouts and throttling
+- add exhaustive logging
+- add metrics (Prometheus)
+- add readiness and health check endpoints
+- support graceful shutdown
+- consider using advanced database migration framework like `github.com/golang-migrate/migrate`
+- automate workflows
+  - add makefile
+  - add CI (GitHub Actions)
