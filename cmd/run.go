@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/leroxyl/greenbone/internal/adapter/storage"
-	"github.com/leroxyl/greenbone/internal/adapter/web"
+	"github.com/leroxyl/computer-manager-api/internal/adapter/storage"
+	"github.com/leroxyl/computer-manager-api/internal/adapter/web"
 )
 
 func Run() {

@@ -3,8 +3,8 @@ package storage
 import (
 	"os"
 
-	"github.com/leroxyl/greenbone/internal/adapter/client"
-	"github.com/leroxyl/greenbone/internal/entity"
+	"github.com/leroxyl/computer-manager-api/internal/adapter/client"
+	"github.com/leroxyl/computer-manager-api/internal/entity"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 

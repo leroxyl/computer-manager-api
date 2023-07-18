@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/leroxyl/greenbone/internal/entity"
+	"github.com/leroxyl/computer-manager-api/internal/entity"
 )
 
 type Server struct {

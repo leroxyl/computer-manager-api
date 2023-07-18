@@ -1,4 +1,4 @@
-# Greenbone Code Challenge
+# Computer Manager API
 
 A basic application for system administrators to keep track of the computers issued by their company.
 The application provides a REST API to manage computer-related datasets that are stored in a postgres database.

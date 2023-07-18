@@ -1,4 +1,4 @@
-module github.com/leroxyl/greenbone
+module github.com/leroxyl/computer-manager-api
 
 go 1.20
 

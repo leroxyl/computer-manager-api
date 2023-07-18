@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/leroxyl/greenbone/cmd"
+	"github.com/leroxyl/computer-manager-api/cmd"
 )
 
 func main() {
