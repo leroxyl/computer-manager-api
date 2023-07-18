@@ -5,33 +5,37 @@ The application provides a REST API to manage computer-related datasets that are
 
 ### Build
 
+#### Build binary
+
+```shell
+go build
+```
+
+Creates the binary `computer-manager-api`.
+
+#### Build Docker image
+
 ```shell
 docker build . -t computer-manager-api
 ```
 
 ### Run
 
-#### Prerequisites
-
-- create a new PostgreSQL database
-  - the DSN has to be set via environment variable `GREENBONE_POSTGRES_DSN`
-  - the database table will be automatically created by the application at start-up
-- start the notification service by running the following command
-    ```shell
-    docker pull greenbone/exercise-admin-notification && \
-    docker run -p 8081:8080 greenbone/exercise-admin-notification
-    ```
-
-#### Run application in Docker container
-
 ```shell
-docker run --network host \
-  -e GREENBONE_POSTGRES_DSN=<DSN> \
-  -e GREENBONE_NOTIFICATION_URL=http://localhost:8081/api/notify \
-  computer-manager-api
+docker-compose up
 ```
 
 The application listens on port `8080`.
+
+```text
+http://localhost:8080/
+```
+
+The database can be reached via the DSN `postgres://postgres:postgres@localhost:5433/greenbone`.
+
+```shell
+psql postgres://postgres:postgres@localhost:5433/greenbone
+```
 
 ### Endpoints
 
