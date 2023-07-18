@@ -25,6 +25,21 @@ The application provides a REST API to manage computer-related datasets that are
 - set the env variable `GREENBONE_NOTIFICATION_URL` with the value of the notification service
   URL: `http://localhost:8081/api/notify`
 
+### Build
+
+```shell
+docker build . -t computer-manager-api
+```
+
+### Run
+
+```shell
+docker run --network host \
+  -e GREENBONE_POSTGRES_DSN=postgres://postgres:postgres@localhost:5432/greenbone \
+  -e GREENBONE_NOTIFICATION_URL=http://localhost:8081/api/notify \
+  computer-manager-api
+```
+
 ### Endpoints
 
 | Action                       | HTTP Method | Path                                         | Content-Type       | Request Body                                           | Description                                            |
