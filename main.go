@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/leroxyl/computer-manager-api/cmd"
+	"github.com/leroxyl/computer-manager-api/internal/cmd"
 )
 
 func main() {
