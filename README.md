@@ -3,28 +3,6 @@
 A basic application for system administrators to keep track of the computers issued by their company.
 The application provides a REST API to manage computer-related datasets that are stored in a postgres database.
 
-### Computer Model
-
-- MAC address (required)
-- computer name (required)
-- IP address (required)
-- employee abbreviation[^1] (optional)
-- description (optional)
-
-[^1]: The employee abbreviation consists of 3 letters. For example Max Mustermann should be mmu.
-
-### Prerequisites
-
-- you need a running postgres database instance and set the DSN via env variable `GREENBONE_POSTGRES_DSN`
-  - the database table will be automatically created at application start-up
-- start the notification service by running the following command
-    ```shell
-    docker pull greenbone/exercise-admin-notification && \
-    docker run -p 8081:8080 greenbone/exercise-admin-notification
-    ```
-- set the env variable `GREENBONE_NOTIFICATION_URL` with the value of the notification service
-  URL: `http://localhost:8081/api/notify`
-
 ### Build
 
 ```shell
@@ -33,23 +11,38 @@ docker build . -t computer-manager-api
 
 ### Run
 
+#### Prerequisites
+
+- create a new PostgreSQL database
+  - the DSN has to be set via environment variable `GREENBONE_POSTGRES_DSN`
+  - the database table will be automatically created by the application at start-up
+- start the notification service by running the following command
+    ```shell
+    docker pull greenbone/exercise-admin-notification && \
+    docker run -p 8081:8080 greenbone/exercise-admin-notification
+    ```
+
+#### Run application in Docker container
+
 ```shell
 docker run --network host \
-  -e GREENBONE_POSTGRES_DSN=postgres://postgres:postgres@localhost:5432/greenbone \
+  -e GREENBONE_POSTGRES_DSN=<DSN> \
   -e GREENBONE_NOTIFICATION_URL=http://localhost:8081/api/notify \
   computer-manager-api
 ```
 
+The application listens on port `8080`.
+
 ### Endpoints
 
-| Action                       | HTTP Method | Path                                         | Content-Type       | Request Body                                           | Description                                            |
-|------------------------------|-------------|----------------------------------------------|--------------------|--------------------------------------------------------|--------------------------------------------------------|
-| Create(Computers)            | **POST**    | /computers                                   | `application/json` | see [JSON](#JSON)                                      | Store the data of a new computer                       |
-| Read(Computers)              | **GET**     | /computers/{mac}                             | _none_             | _empty_                                                | Get the data of a computer                             |
-| Update(Computers)            | **PUT**     | /computers/{mac}                             | `application/json` | like [JSON](#JSON), but field `macAddr` can be omitted | Update the data of a computer                          |
-| Delete(Computers)            | **DELETE**  | /computers/{mac}                             | _none_             | _empty_                                                | Delete the data of a computer                          |
-| Read All(Computers)          | **GET**     | /computers                                   | _none_             | _empty_                                                | Get the data of all computers                          |
-| Read All Computers(Employee) | **GET**     | /employees/{employee-abbreviation}/computers | _none_             | _empty_                                                | Get the data of all assigned computers for an employee |
+| Action                       | HTTP Method | Path                                         | Content-Type       | Request Body                                                          | Description                                            |
+|------------------------------|-------------|----------------------------------------------|--------------------|-----------------------------------------------------------------------|--------------------------------------------------------|
+| Create(Computers)            | **POST**    | /computers                                   | `application/json` | see [JSON](#computer-model-json)                                      | Store the data of a new computer                       |
+| Read(Computers)              | **GET**     | /computers/{mac}                             | _none_             | _empty_                                                               | Get the data of a computer                             |
+| Update(Computers)            | **PUT**     | /computers/{mac}                             | `application/json` | like [JSON](#computer-model-json), but field `macAddr` can be omitted | Update the data of a computer                          |
+| Delete(Computers)            | **DELETE**  | /computers/{mac}                             | _none_             | _empty_                                                               | Delete the data of a computer                          |
+| Read All(Computers)          | **GET**     | /computers                                   | _none_             | _empty_                                                               | Get the data of all computers                          |
+| Read All Computers(Employee) | **GET**     | /employees/{employee-abbreviation}/computers | _none_             | _empty_                                                               | Get the data of all assigned computers for an employee |
 
 > Update(Computers):
 >   - operation does not support update of the MAC address
@@ -59,7 +52,7 @@ docker run --network host \
 > Delete(Computers):
 >   - repeatedly calling delete on same resource will return `200`
 
-### JSON
+### Computer Model JSON
 
 ```json
 {
