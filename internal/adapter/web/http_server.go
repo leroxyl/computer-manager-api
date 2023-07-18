@@ -1,11 +1,12 @@
 package web
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/leroxyl/computer-manager-api/internal/entity"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Server struct {
