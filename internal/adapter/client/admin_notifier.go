@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 )
 
-const notificationServiceURL = "http://localhost:8081/api/notify" // TODO externalize URL
+var notificationServiceURL = os.Getenv("GREENBONE_NOTIFICATION_URL")
 
 type Alarm struct {
 	Level                string `json:"level"`

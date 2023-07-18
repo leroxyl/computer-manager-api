@@ -22,6 +22,8 @@ The application provides a REST API to manage computer-related datasets that are
     docker pull greenbone/exercise-admin-notification && \
     docker run -p 8081:8080 greenbone/exercise-admin-notification
     ```
+- set the env variable `GREENBONE_NOTIFICATION_URL` with the value of the notification service
+  URL: `http://localhost:8081/api/notify`
 
 ### Endpoints
 
