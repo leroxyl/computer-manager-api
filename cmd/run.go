@@ -9,6 +9,9 @@ func Run() {
 	// initialize database
 	cm := storage.NewComputerManager()
 
-	// start server
-	web.Run(cm)
+	// set up server
+	r := web.NewServer(cm)
+
+	// start server (blocks)
+	r.Run()
 }

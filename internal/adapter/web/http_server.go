@@ -8,6 +8,11 @@ import (
 	"github.com/leroxyl/greenbone/internal/entity"
 )
 
+type Server struct {
+	router          *gin.Engine
+	computerManager ComputerManager
+}
+
 type ComputerManager interface {
 	Create(entity.Computer) error
 	Read(mac string) (entity.Computer, error)
@@ -17,26 +22,35 @@ type ComputerManager interface {
 	ReadAllForEmployee(abbr string) ([]entity.Computer, error)
 }
 
-// Run initializes all endpoints and starts the server.
-// Note: this method will block the calling goroutine indefinitely unless an error happens.
-func Run(cm ComputerManager) {
+// NewServer initializes a new server instance and sets up all endpoints
+func NewServer(cm ComputerManager) *Server {
 	r := gin.Default()
 
-	r.POST("/computers", createComputer(cm))
-	r.GET("/computers/:mac", readComputer(cm))
-	r.PUT("/computers/:mac", updateComputer(cm))
-	r.DELETE("/computers/:mac", deleteComputer(cm))
-	r.GET("/computers", readAllComputers(cm))
-	r.GET("/employees/:abbr/computers", readAllComputersForEmployee(cm))
+	server := &Server{
+		router:          r,
+		computerManager: cm,
+	}
 
-	// listen and serve
-	err := r.Run()
+	r.POST("/computers", server.createComputer())
+	r.GET("/computers/:mac", server.readComputer())
+	r.PUT("/computers/:mac", server.updateComputer())
+	r.DELETE("/computers/:mac", server.deleteComputer())
+	r.GET("/computers", server.readAllComputers())
+	r.GET("/employees/:abbr/computers", server.readAllComputersForEmployee())
+
+	return server
+}
+
+// Run starts the server.
+// Note: this method will block the calling goroutine indefinitely unless an error happens.
+func (s *Server) Run() {
+	err := s.router.Run()
 	if err != nil {
 		log.Fatalf("failed to start server: %v", err)
 	}
 }
 
-func createComputer(cm ComputerManager) gin.HandlerFunc {
+func (s *Server) createComputer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		computer := entity.Computer{}
 		err := c.BindJSON(&computer)
@@ -45,7 +59,7 @@ func createComputer(cm ComputerManager) gin.HandlerFunc {
 			return
 		}
 
-		err = cm.Create(computer)
+		err = s.computerManager.Create(computer)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -55,11 +69,11 @@ func createComputer(cm ComputerManager) gin.HandlerFunc {
 	}
 }
 
-func readComputer(cm ComputerManager) gin.HandlerFunc {
+func (s *Server) readComputer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		mac := getMACAddress(c)
 
-		computer, err := cm.Read(mac)
+		computer, err := s.computerManager.Read(mac)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -69,7 +83,7 @@ func readComputer(cm ComputerManager) gin.HandlerFunc {
 	}
 }
 
-func updateComputer(cm ComputerManager) gin.HandlerFunc {
+func (s *Server) updateComputer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		mac := getMACAddress(c)
 
@@ -89,7 +103,7 @@ func updateComputer(cm ComputerManager) gin.HandlerFunc {
 		// insert MAC address from URL parameter into Computer instance
 		computer.MACAddr = mac
 
-		err = cm.Update(computer)
+		err = s.computerManager.Update(computer)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -99,11 +113,11 @@ func updateComputer(cm ComputerManager) gin.HandlerFunc {
 	}
 }
 
-func deleteComputer(cm ComputerManager) gin.HandlerFunc {
+func (s *Server) deleteComputer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		mac := getMACAddress(c)
 
-		err := cm.Delete(mac)
+		err := s.computerManager.Delete(mac)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -113,9 +127,9 @@ func deleteComputer(cm ComputerManager) gin.HandlerFunc {
 	}
 }
 
-func readAllComputers(cm ComputerManager) gin.HandlerFunc {
+func (s *Server) readAllComputers() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		computers, err := cm.ReadAll()
+		computers, err := s.computerManager.ReadAll()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -125,11 +139,11 @@ func readAllComputers(cm ComputerManager) gin.HandlerFunc {
 	}
 }
 
-func readAllComputersForEmployee(cm ComputerManager) gin.HandlerFunc {
+func (s *Server) readAllComputersForEmployee() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		abbr := c.Param("abbr")
 
-		computers, err := cm.ReadAllForEmployee(abbr)
+		computers, err := s.computerManager.ReadAllForEmployee(abbr)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
