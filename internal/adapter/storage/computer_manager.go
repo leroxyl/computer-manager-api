@@ -47,8 +47,8 @@ func NewComputerManager() *ComputerManager {
 	}
 }
 
-func (cm *ComputerManager) Create(computer *entity.Computer) error {
-	result := cm.db.Create(computer)
+func (cm *ComputerManager) Create(computer entity.Computer) error {
+	result := cm.db.Create(&computer)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -58,13 +58,17 @@ func (cm *ComputerManager) Create(computer *entity.Computer) error {
 	return nil
 }
 
-func (cm *ComputerManager) Read(computer *entity.Computer) error {
-	result := cm.db.First(computer)
-	return result.Error
+func (cm *ComputerManager) Read(mac string) (entity.Computer, error) {
+	computer := entity.Computer{
+		MACAddr: mac,
+	}
+
+	result := cm.db.First(&computer)
+	return computer, result.Error
 }
 
-func (cm *ComputerManager) Update(computer *entity.Computer) error {
-	result := cm.db.Save(computer)
+func (cm *ComputerManager) Update(computer entity.Computer) error {
+	result := cm.db.Save(&computer)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -74,19 +78,23 @@ func (cm *ComputerManager) Update(computer *entity.Computer) error {
 	return nil
 }
 
-func (cm *ComputerManager) Delete(computer *entity.Computer) error {
-	result := cm.db.Delete(computer)
+func (cm *ComputerManager) Delete(mac string) error {
+	computer := entity.Computer{
+		MACAddr: mac,
+	}
+
+	result := cm.db.Delete(&computer)
 	return result.Error
 }
 
-func (cm *ComputerManager) ReadAll(computers *[]entity.Computer) error {
-	result := cm.db.Find(computers)
-	return result.Error
+func (cm *ComputerManager) ReadAll() (computers []entity.Computer, err error) {
+	result := cm.db.Find(&computers)
+	return computers, result.Error
 }
 
-func (cm *ComputerManager) ReadAllForEmployee(computers *[]entity.Computer, employeeAbbr string) error {
-	result := cm.db.Where("employee_abbr = ?", employeeAbbr).Find(computers)
-	return result.Error
+func (cm *ComputerManager) ReadAllForEmployee(employeeAbbr string) (computers []entity.Computer, err error) {
+	result := cm.db.Where("employee_abbr = ?", employeeAbbr).Find(&computers)
+	return computers, result.Error
 }
 
 func (cm *ComputerManager) checkComputerCount(employeeAbbr string) {

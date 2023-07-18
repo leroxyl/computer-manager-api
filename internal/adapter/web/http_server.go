@@ -9,12 +9,12 @@ import (
 )
 
 type ComputerManager interface {
-	Create(*entity.Computer) error
-	Read(*entity.Computer) error
-	Update(*entity.Computer) error
-	Delete(*entity.Computer) error
-	ReadAll(*[]entity.Computer) error
-	ReadAllForEmployee(*[]entity.Computer, string) error
+	Create(entity.Computer) error
+	Read(mac string) (entity.Computer, error)
+	Update(entity.Computer) error
+	Delete(mac string) error
+	ReadAll() ([]entity.Computer, error)
+	ReadAllForEmployee(abbr string) ([]entity.Computer, error)
 }
 
 // Run initializes all endpoints and starts the server.
@@ -27,7 +27,7 @@ func Run(cm ComputerManager) {
 	r.PUT("/computers/:mac", updateComputer(cm))
 	r.DELETE("/computers/:mac", deleteComputer(cm))
 	r.GET("/computers", readAllComputers(cm))
-	r.GET("/employees/:id/computers", readAllComputersForEmployee(cm))
+	r.GET("/employees/:abbr/computers", readAllComputersForEmployee(cm))
 
 	// listen and serve
 	err := r.Run()
@@ -38,8 +38,8 @@ func Run(cm ComputerManager) {
 
 func createComputer(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		computer := &entity.Computer{}
-		err := c.BindJSON(computer)
+		computer := entity.Computer{}
+		err := c.BindJSON(&computer)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -57,11 +57,9 @@ func createComputer(cm ComputerManager) gin.HandlerFunc {
 
 func readComputer(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		computer := &entity.Computer{
-			MACAddr: getMACAddress(c),
-		}
+		mac := getMACAddress(c)
 
-		err := cm.Read(computer)
+		computer, err := cm.Read(mac)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -75,8 +73,8 @@ func updateComputer(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		mac := getMACAddress(c)
 
-		computer := &entity.Computer{}
-		err := c.BindJSON(computer)
+		computer := entity.Computer{}
+		err := c.BindJSON(&computer)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -103,11 +101,9 @@ func updateComputer(cm ComputerManager) gin.HandlerFunc {
 
 func deleteComputer(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		computer := &entity.Computer{
-			MACAddr: getMACAddress(c),
-		}
+		mac := getMACAddress(c)
 
-		err := cm.Delete(computer)
+		err := cm.Delete(mac)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -119,9 +115,7 @@ func deleteComputer(cm ComputerManager) gin.HandlerFunc {
 
 func readAllComputers(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var computers []entity.Computer
-
-		err := cm.ReadAll(&computers)
+		computers, err := cm.ReadAll()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -133,9 +127,9 @@ func readAllComputers(cm ComputerManager) gin.HandlerFunc {
 
 func readAllComputersForEmployee(cm ComputerManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var computers []entity.Computer
+		abbr := c.Param("abbr")
 
-		err := cm.ReadAllForEmployee(&computers, c.Param("id"))
+		computers, err := cm.ReadAllForEmployee(abbr)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
