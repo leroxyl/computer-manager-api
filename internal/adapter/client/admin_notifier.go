@@ -42,7 +42,12 @@ func NotifyAdmin(employeeAbbr string, computerCount int64) {
 		log.Errorf("admin notification failed: %v", err)
 		return
 	}
-	defer resp.Body.Close()
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			log.Errorf("failed to close response body from admin notification service: %v", err)
+		}
+	}()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
