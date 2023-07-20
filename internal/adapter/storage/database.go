@@ -1,9 +1,7 @@
 package storage
 
 import (
-	"os"
-
-	"github.com/leroxyl/computer-manager-api/internal/adapter/client"
+	"github.com/leroxyl/computer-manager-api/internal/config"
 	"github.com/leroxyl/computer-manager-api/internal/entity"
 	"github.com/leroxyl/computer-manager-api/internal/usecase"
 	"gorm.io/driver/postgres"
@@ -12,29 +10,22 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	dsnEnv = "GREENBONE_POSTGRES_DSN"
+const adminNotificationThreshold = 3 // TODO make admin notification threshold configurable
 
-	adminNotificationThreshold = 3 // TODO make admin notification threshold configurable
-)
+type notifyAdmin func(employeeAbbr string, computerCount int64)
 
 type DatabaseManager struct {
 	db *gorm.DB
+	notifyAdmin
 }
 
 // Ensure DatabaseManager implements the ComputerManager interface
 var _ usecase.ComputerManager = (*DatabaseManager)(nil)
 
 // NewDatabaseManager initializes a new database connection and prepares the computer table
-func NewDatabaseManager() *DatabaseManager {
-	// load DSN from environment
-	dsn := os.Getenv(dsnEnv)
-	if dsn == "" {
-		log.Fatalf("environment variable %s not set, please provide DSN for postgres database instance", dsnEnv)
-	}
-
+func NewDatabaseManager(conf config.DatabaseConfig, notify notifyAdmin) *DatabaseManager {
 	// initialize db session
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(conf.DSN), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to initialize db session: %v", err)
 	}
@@ -47,7 +38,8 @@ func NewDatabaseManager() *DatabaseManager {
 	}
 
 	return &DatabaseManager{
-		db: db,
+		db:          db,
+		notifyAdmin: notify,
 	}
 }
 
@@ -111,7 +103,7 @@ func (dm *DatabaseManager) checkComputerCount(employeeAbbr string) {
 	log.Infof("employee %s now has %d computers", employeeAbbr, computerCount)
 
 	if computerCount >= adminNotificationThreshold {
-		client.NotifyAdmin(employeeAbbr, computerCount)
+		dm.notifyAdmin(employeeAbbr, computerCount)
 	}
 }
 

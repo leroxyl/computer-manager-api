@@ -31,10 +31,10 @@ The application listens on port `8080`.
 http://localhost:8080/
 ```
 
-The database can be reached via the DSN `postgres://postgres:postgres@localhost:5433/greenbone`.
+The database can be reached via the DSN `postgres://postgres:postgres@localhost:5433/computer_manager_api`.
 
 ```shell
-psql postgres://postgres:postgres@localhost:5433/greenbone
+psql postgres://postgres:postgres@localhost:5433/computer_manager_api
 ```
 
 ### Endpoints

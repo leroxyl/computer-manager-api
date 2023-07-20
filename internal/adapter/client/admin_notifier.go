@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
+
+	"github.com/leroxyl/computer-manager-api/internal/config"
 
 	log "github.com/sirupsen/logrus"
 )
-
-var notificationServiceURL = os.Getenv("GREENBONE_NOTIFICATION_URL")
 
 type Alarm struct {
 	Level   string `json:"level"`
@@ -19,9 +18,19 @@ type Alarm struct {
 	Message string `json:"message"`
 }
 
+type NotificationServiceClient struct {
+	url string
+}
+
+func NewNotificationServiceClient(conf config.ClientConfig) *NotificationServiceClient {
+	return &NotificationServiceClient{
+		url: conf.NotificationServiceURL,
+	}
+}
+
 // NotifyAdmin sends an HTTP request to an external notification service in order to inform
 // an admin about employees with excessive computer demands
-func NotifyAdmin(employeeAbbr string, computerCount int64) {
+func (c *NotificationServiceClient) NotifyAdmin(employeeAbbr string, computerCount int64) {
 	alarm := Alarm{
 		Level:   "warning",
 		Abbr:    employeeAbbr,
@@ -37,7 +46,7 @@ func NotifyAdmin(employeeAbbr string, computerCount int64) {
 		panic(err)
 	}
 
-	resp, err := http.Post(notificationServiceURL, "application/json", buffer)
+	resp, err := http.Post(c.url, "application/json", buffer)
 	if err != nil {
 		log.Errorf("admin notification failed: %v", err)
 		return
