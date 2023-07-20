@@ -11,7 +11,7 @@ func Run() {
 	log.Infof("Starting Computer Manager API")
 
 	// initialize database
-	cm := storage.NewComputerManager()
+	cm := storage.NewDatabaseManager()
 
 	// set up server
 	r := web.NewServer(cm)

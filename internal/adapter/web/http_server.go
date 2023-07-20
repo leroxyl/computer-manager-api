@@ -5,26 +5,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/leroxyl/computer-manager-api/internal/entity"
+	"github.com/leroxyl/computer-manager-api/internal/usecase"
 
 	log "github.com/sirupsen/logrus"
 )
 
 type Server struct {
 	router          *gin.Engine
-	computerManager ComputerManager
-}
-
-type ComputerManager interface {
-	Create(entity.Computer) error
-	Read(mac string) (entity.Computer, error)
-	Update(entity.Computer) error
-	Delete(mac string) error
-	ReadAll() ([]entity.Computer, error)
-	ReadAllForEmployee(abbr string) ([]entity.Computer, error)
+	computerManager usecase.ComputerManager
 }
 
 // NewServer initializes a new server instance and sets up all endpoints
-func NewServer(cm ComputerManager) *Server {
+func NewServer(cm usecase.ComputerManager) *Server {
 	r := gin.Default()
 
 	server := &Server{
